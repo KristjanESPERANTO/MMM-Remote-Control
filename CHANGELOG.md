@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Added a spell checker and fixed problems that were found.
 
+### Fixed
+
+- Fix URLs
+
+### Changed
+
+- Replace `node-fetch` by internal fetch API
+
 ## [2.4.0] - 2024-10-08
 
 ### Fixed
