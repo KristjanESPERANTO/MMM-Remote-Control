@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+https://github.com/jopyth/MMM-Remote-Control"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "keywords": [
     "magic mirror",
     "smart mirror",
@@ -23,7 +26,6 @@
   "dependencies": {
     "body-parser": "latest",
     "lodash": "latest",
-    "node-fetch": "^2.7.0",
     "simple-git": "latest",
     "uuid": "^3.3.2"
   },
