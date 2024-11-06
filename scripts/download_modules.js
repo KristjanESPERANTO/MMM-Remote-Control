@@ -15,7 +15,7 @@ const path = require("path");
 const fs = require("fs");
 const util = require("util");
 
-var downloadModules = {
+let downloadModules = {
     defaults: {
         modulesFile: path.resolve(__dirname, "../modules.json"),    // Path to modules file
         sourceUrl: 'https://raw.githubusercontent.com/wiki/MagicMirrorOrg/MagicMirror/3rd-Party-Modules.md', // Source url
@@ -69,8 +69,8 @@ var downloadModules = {
         .then((response) => response.text())
         .then((body) => {
             let modules = this.parseList(body);
-            var json = JSON.stringify(modules, undefined, 2);
-            var jsonPath = this.config.modulesFile;
+            let json = JSON.stringify(modules, undefined, 2);
+            let jsonPath = this.config.modulesFile;
             fs.writeFile(jsonPath, json, "utf8", (err, data) => {
                 if (err) {
                     console.error("MODULE LIST ERROR: modules.json updating fail:" + err.message);
