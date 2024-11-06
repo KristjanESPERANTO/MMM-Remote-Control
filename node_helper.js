@@ -311,12 +311,22 @@ module.exports = NodeHelper.create(Object.assign({
         },
 
         loadModuleDefaultConfig(module, modulePath, lastOne) {
-            // function copied from MagicMirrorOrg (MIT)
-            let filename = path.resolve(modulePath + "/" + module.longname + ".js");
+            const filename = path.resolve(modulePath + "/" + module.longname + ".js");
+            const tempFilename = path.resolve("./modules/temp.js");
+
             try {
                 fs.accessSync(filename, fs.F_OK);
-                const jsFile = require(filename);
+                // Add new line at the beginning of the file (this is necessary for module which are bundled)
+                const newContent = "const Log = console;const document = navigator = window = {};document.createElement = function() { return {}; };\n" + fs.readFileSync(filename, 'utf8');
+                
+                // Write the new content to the temporary file
+                fs.writeFileSync(tempFilename, newContent, 'utf8');
+                
                 /* Defaults are stored when Module.register is called during require(filename); */
+                const jsFile = require(tempFilename);
+
+                // Unlink the temporary file
+                fs.unlinkSync(tempFilename);
             } catch (e) {
                 if (e.code == "ENOENT") {
                     console.error("ERROR! Could not find main module js file for " + module.longname);
