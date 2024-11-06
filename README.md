@@ -104,7 +104,7 @@ git tag # display them
 
 The output should look similar to this:
 
-```
+```bash
 v1.0.0
 v1.1.0
 v1.1.1
@@ -128,14 +128,12 @@ For example you can use [MMM-ModuleScheduler](https://forum.magicmirror.builders
 
 - Example for a REST API GET request to trigger a RaspberryPi restart:
 
-```
-http://192.168.xxx.xxx:8080/api/restart
-```
+`http://192.168.xxx.xxx:8080/api/restart`
 
 - Example to trigger a RaspberryPi restart in your module:
 
-```
-this.sendNotification('REMOTE_ACTION', {action: 'RESTART'});
+```js
+this.sendNotification("REMOTE_ACTION", { action: "RESTART" });
 ```
 
 See some specific examples for controlling your mirror from other modules and add your own examples [in the Wiki page here](https://github.com/shbatm/MMM-Remote-Control/wiki/Examples-for-Controlling-from-Another-Module)

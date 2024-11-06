@@ -54,12 +54,12 @@ If you ran the `installer.sh` script when you installed the module, a non-canoni
 ### Example Config Section
 
 ```js
-{
-    module: 'MMM-Remote-Control'
-    config: {
-        apiKey: 'bc2e979db92f4741afad01d5d18eb8e2'
-    }
-},
+    {
+        module: 'MMM-Remote-Control'
+        config: {
+            apiKey: 'bc2e979db92f4741afad01d5d18eb8e2'
+        }
+    },
 ```
 
 ### Passing your API key
@@ -91,12 +91,12 @@ Since 2.2.0, and in a way to prevent malicious actions on your mirror, a new con
 As usual, this option can be disabled, but this will expose your Mirror to potentials hackers, so it's up to you to turn it off.
 
 ```js
-{
-    module: 'MMM-Remote-Control'
-    config: {
-        secureEndpoints: true
-    }
-},
+    {
+        module: 'MMM-Remote-Control'
+        config: {
+            secureEndpoints: true
+        }
+    },
 ```
 
 By default, secureEndpoints it's true, defending commands like shutdown or install modules when no apikey it's present.
@@ -109,7 +109,7 @@ There are three general categories of API commands:
 **1. MMM-Remote-Control Internal Commands** -- these are used to call the existing commands that MMM-Remote-Control already exposes. For example, to turn off the monitor ("MONITOROFF"):
 
 ```bash
-            curl -X GET http://magicmirrorip:8080/api/monitor/off
+    curl -X GET http://magicmirrorip:8080/api/monitor/off
 ```
 
 **2. External APIs (Guessed)** -- when this module first loads, it parses all of the installed modules' source code and checks for any custom notifications that are used. From this basic search, it tries to "guess" notification actions that may be valid, without them being explicitly defined anywhere else. For example, the "alert" command examples above are not defined within this module, the 'alert' module just looks for a notification, "SHOW_ALERT"--this is exposed as a `/module/alert/showalert` action in the External API processor. Full credit to this idea goes to `juzim` from the MMM-Api module.

@@ -1,6 +1,8 @@
+/* global $ */
+
 // main javascript file for the remote control page
 
-var Remote = {
+let Remote = {
     name: "MMM-Remote-Control",
     currentMenu: "main-menu",
     types: ["string", "number", "boolean", "array", "object", "null", "undefined"],
@@ -1067,7 +1069,7 @@ var Remote = {
             let path = elements[i].id;
             let splitPath = path.split("/");
             let parent = rootElement;
-            for (var k = 1; k < splitPath.length - 1; k++) {
+            for (let k = 1; k < splitPath.length - 1; k++) {
                 parent = this.navigate(parent, splitPath[k]);
             }
             let name = splitPath[k];
@@ -1573,7 +1575,7 @@ var Remote = {
     }
 };
 
-var buttons = {
+let buttons = {
     // navigation buttons
     "power-button": function () {
         window.location.hash = "power-menu";
