@@ -5,14 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [2.5.0] - 2024-11-20
-
-### Added
-
-- Added a spell checker and fixed problems that were found (#308).
-- Added JavaScript linting (for the start with soft rules) (#310).
-- Added GitHub workflow for linting and spell checking on every push and pull request (#310).
-- Added Turkish language (#305)
+## [UNRELEASED]
 
 ### Fixed
 
@@ -21,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - Replace `node-fetch` by internal fetch API
+- Update dependencies
+
+## [2.5.0] - 2024-11-20
+
+### Added
+
+- Added a spell checker and fixed problems that were found (#308).
+- Added JavaScript linting (for the start with soft rules) (#310).
+- Added GitHub workflow for linting and spell checking on every push and pull request (#310).
+- Added Turkish language (#305)
 
 ## [2.4.0] - 2024-10-08
 
