@@ -49,7 +49,6 @@ module.exports = {
 
         let getActions = function(content) {
             let re = /notification \=\=\=? (?:"|')([A-Z_-]+?)(?:"|')|case (?:"|')([A-Z_-]+)(?:"|')/g;
-            let m;
             let availableActions = [];
             if (re.test(content)) {
                 content.match(re).forEach((match) => {
@@ -284,13 +283,13 @@ module.exports = {
                 this.executeQuery(this.checkDelay({ action: `MONITOR${actionName}` }, req), res);
             })
             .post((req, res) => {
-                var actionName = "STATUS";
+                let actionName = "STATUS";
                 if (typeof req.body !== 'undefined' && "monitor" in req.body) {
                     if (["OFF", "ON", "TOGGLE"].includes(req.body.monitor.toUpperCase())) {
                         actionName = req.body.monitor.toUpperCase();
                     }
                 } else {
-                    actionName = req.params.action ? req.params.action.toUpperCase() : "STATUS";
+                        actionName = req.params.action ? req.params.action.toUpperCase() : "STATUS";
                 }
                 this.executeQuery(this.checkDelay({ action: `MONITOR${actionName}` }, req), res);
             });

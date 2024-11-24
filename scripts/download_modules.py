@@ -43,8 +43,6 @@ def parse(content):
         # name needs to be normalized later again anyway
         # short_name = makeConsistentName(name)
 
-        url = url.replace("bit.ly/MMM-Instagram", "github.com/kapsolas/MMM-Instagram")
-        url = url.replace("bit.ly/MMM-Flickr", "github.com/kapsolas/MMM-Flickr")
         url = url.replace("http:", "https:")
         split_url = url.split("/")[:5]
         identifier = split_url[-2] + "/" + split_url[-1]

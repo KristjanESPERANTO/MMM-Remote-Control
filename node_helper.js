@@ -1,4 +1,7 @@
-/* MagicMirror²
+/* global Module:true */
+
+/*
+ * MagicMirror²
  * Module: Remote Control
  *
  * By Joseph Bethge
@@ -14,8 +17,6 @@ const exec = require("child_process").exec;
 const Log = require("logger");
 const os = require("os");
 const simpleGit = require("simple-git");
-const bodyParser = require("body-parser");
-const express = require("express");
 const _ = require("lodash");
 
 let defaultModules = require(path.resolve(__dirname + "/../../modules/default/defaultmodules.js"));
