@@ -22,16 +22,16 @@ const config = [
       "consistent-this": "off",
       "line-comment-position": "off",
       "max-lines-per-function": ["warn", 210],
-      "max-statements": ["warn", 100],
+      "max-statements": ["warn", 60],
       "multiline-comment-style": "off",
       "no-await-in-loop": "off",
       "no-constant-binary-expression": "warn",
       "no-inline-comments": "off",
       "no-magic-numbers": "off",
       "no-plusplus": "off",
-      "no-prototype-builtins": "warn",
-      "no-undef": "warn",
-      "no-unused-vars": "warn",
+      "no-prototype-builtins": "error",
+      "no-undef": "error",
+      "no-unused-vars": "error",
       "no-useless-escape": "warn",
       "no-var": "error",
       "one-var": "off",
@@ -49,11 +49,9 @@ const config = [
       "sourceType": "module"
     },
     "rules": {
-      "func-style": "off",
       "max-lines-per-function": ["error", 100],
       "no-magic-numbers": "off",
-      "one-var": "off",
-      "prefer-destructuring": "off"
+      "one-var": "off"
     }
   }
 ];

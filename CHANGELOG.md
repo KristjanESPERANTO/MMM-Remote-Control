@@ -167,7 +167,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [2.1.0] - 2020-11-01
 
-Hello! Ezequiel here. Just wanted to say thanks for trust in me, in the past days I made a lot of changes into the code, adding some functions that'll surely be in a future release, and also putting everything together in my fork. I answered almost every issue raised, and tried to help every person that use this module. Today, I'm glad to be able to share everything I learned to all of you. I apologize for some fast and uncommented commits, I just thought that some things needed to be fixed ASAP.
+Hello! Ezequiel here. Just wanted to say thanks for trust in me. Over the past days, I've made a lot of changes into the code, adding some functions that'll surely be in a future release, and also putting everything together in my fork. I answered almost every issue raised, and tried to help every person that use this module. Today, I'm glad to be able to share everything I learned to all of you. I apologize for some fast and uncommented commits, I just thought that some things needed to be fixed ASAP.
 See you in future commits, issues and PRs :D
 
 ### Fixed
@@ -208,7 +208,7 @@ Now requires MagicMirror² version 2.7.
 
 ## [2.0.0] - 2019-02-21
 
-Huge shout out to [shbatm](https://github.com/shbatm) for his work on this new major version, which brings a new API, custom menus and commands and lots of other stuff:
+Huge shout out to [shbatm](https://github.com/shbatm) for his work on this new major version, which brings a new API, custom menus, commands and lots of other stuff:
 
 ### Added
 

@@ -70,7 +70,7 @@ let Remote = {
                 if (payload.query.data === "config_update") {
                     this.saveConfigCallback(payload);
                 } else if (payload.query.data === "saves") {
-                	this.undoConfigMenuCallback(payload)
+                    this.undoConfigMenuCallback(payload)
                 } else if (payload.query.data === "mmUpdateAvailable") {
                     this.mmUpdateCallback(payload.result);
                 } else if (payload.query.data === "brightness") {
@@ -85,8 +85,8 @@ let Remote = {
                 return;
             }
             if ("code" in payload && payload.code === "restart") {
-            	let chlog = new showdown.Converter()
-            	chlog.setFlavor('github')
+                let chlog = new showdown.Converter()
+                chlog.setFlavor('github')
                 this.offerRestart(payload.chlog ? payload.info + "<br><div id='changelog'>" + chlog.makeHtml(payload.chlog) + "</div>": payload.info);
                 return;
             }
@@ -313,16 +313,16 @@ let Remote = {
         }
         
         if (newMenu === "main-menu") {
-        	this.loadList("config-modules", "config", function(parent,configData) {
+            this.loadList("config-modules", "config", function(parent,configData) {
                 
-        		let alertElem = document.getElementById("alert-button")
-        		if(!configData.modules.find(m=>m.module==="alert") && alertElem !== undefined) alertElem.remove();
+                let alertElem = document.getElementById("alert-button")
+                if(!configData.modules.find(m=>m.module==="alert") && alertElem !== undefined) alertElem.remove();
                 
                 let modConfig = configData.modules.find(m=>m.module==="MMM-Remote-Control").config
                 let classElem = document.getElementById("classes-button")
                 if((!modConfig || !modConfig.classes) && classElem !== undefined) classElem.remove();
                 
-        	})
+            })
         }
         
         let allMenus = document.getElementsByClassName("menu-element");
@@ -1215,30 +1215,30 @@ let Remote = {
     },
     
     loadClasses() {
-    	let self = this;
-    	
-    	console.log("Loading classes...");
-    	this.loadList("classes", "classes", function(parent, classes) {
-    		for(const i in classes) {
-    			let $node = $("<div>").attr("id", "classes-before-result").attr("hidden", "true")
-    			$('#classes-results').append($node)
-    			let content = Object.assign({}, {
-						id: i,
-						text: i,
-						icon: "dot-circle-o",
-						type: "item",
-						action: "MANAGE_CLASSES",
-    				},{
-						content: {
-							payload: {
-								classes: i
-							}
-    				}
-    			})
-    			if ($(`#${content.id}-button`)) $(`#${content.id}-button`).remove()
-    			self.createMenuElement(content, "classes", $("#classes-before-result"))
-    		}
-    	})
+        let self = this;
+        
+        console.log("Loading classes...");
+        this.loadList("classes", "classes", function(parent, classes) {
+            for(const i in classes) {
+                let $node = $("<div>").attr("id", "classes-before-result").attr("hidden", "true")
+                $('#classes-results').append($node)
+                let content = Object.assign({}, {
+                        id: i,
+                        text: i,
+                        icon: "dot-circle-o",
+                        type: "item",
+                        action: "MANAGE_CLASSES",
+                    },{
+                        content: {
+                            payload: {
+                                classes: i
+                            }
+                    }
+                })
+                if ($(`#${content.id}-button`)) $(`#${content.id}-button`).remove()
+                self.createMenuElement(content, "classes", $("#classes-before-result"))
+            }
+        })
     },
 
     createAddingPopup(index) {
@@ -1340,11 +1340,11 @@ let Remote = {
         let info = document.createElement("span");
         info.innerHTML = message;
         wrapper.appendChild(info);
-		
-		let restart = this.createSymbolText("fa fa-fw fa-recycle", this.translate("RESTARTMM"), buttons["restart-mm-button"]);
+        
+        let restart = this.createSymbolText("fa fa-fw fa-recycle", this.translate("RESTARTMM"), buttons["restart-mm-button"]);
         restart.children[1].className += " text";
         wrapper.appendChild(restart);
-		
+        
         let reload = this.createSymbolText("fa fa-fw fa-globe", this.translate("REFRESHMM"), buttons["refresh-mm-button"]);
         reload.children[1].className += " text";
         wrapper.appendChild(reload);
@@ -1353,16 +1353,16 @@ let Remote = {
     },
     
     offerOptions: function(message, data) {
-    	let wrapper = document.createElement("div");
-    	
-    	let info = document.createElement("span");
+        let wrapper = document.createElement("div");
+        
+        let info = document.createElement("span");
         info.innerHTML = message;
         wrapper.appendChild(info);
         
         for(const b in data) {
-        	let restart = this.createSymbolText("fa fa-fw fa-recycle", b, data[b]);
-        	restart.children[1].className += " text";
-        	wrapper.appendChild(restart);
+            let restart = this.createSymbolText("fa fa-fw fa-recycle", b, data[b]);
+            restart.children[1].className += " text";
+            wrapper.appendChild(restart);
         }
         
         this.setStatus("success", false, wrapper);
@@ -1432,17 +1432,17 @@ let Remote = {
     },
 
     undoConfigMenuCallback(result) {
-    	let self = this;
+        let self = this;
 
         if (result.success) {
-        	let dates = {};
-        	for(const i in result.data) {
-        		dates[new Date(result.data[i])] = function() {
-        			console.log(result.data[i])
-        			self.undoConfig(result.data[i])
-        		}
-        	}
-        	self.offerOptions(self.translate("DONE"),dates);
+            let dates = {};
+            for(const i in result.data) {
+                dates[new Date(result.data[i])] = function() {
+                    console.log(result.data[i])
+                    self.undoConfig(result.data[i])
+                }
+            }
+            self.offerOptions(self.translate("DONE"),dates);
         } else {
             self.setStatus("error");
         }
@@ -1601,7 +1601,7 @@ let buttons = {
         window.open("/", "_blank");
     },
     "classes-button": function () {
-    	window.location.hash = "classes-menu";
+        window.location.hash = "classes-menu";
     },
     "back-button": function() {
         if (window.location.hash === "#add-module-menu") {

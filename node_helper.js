@@ -78,18 +78,18 @@ module.exports = NodeHelper.create(Object.assign({
             /* API EXTENSION - Added v2.0.0 */
             this.createApiRoutes();
 
-	    	this.loadTimers();
-	    },
+            this.loadTimers();
+        },
 
-		loadTimers() {
+        loadTimers() {
             let delay = 24*3600;
             
             let self = this;
             
             clearTimeout(this.delayedQueryTimers['update'])
             this.delayedQueryTimers['update'] = setTimeout(function () {
-            	self.updateModuleList();
-            	self.loadTimers();
+                self.updateModuleList();
+                self.loadTimers();
             }, delay*1000);
         },
 
@@ -534,8 +534,8 @@ module.exports = NodeHelper.create(Object.assign({
                 return;
             }
             if (query.data === "classes") {
-            	let thisConfig = this.getConfig().modules.find(m => m.module === "MMM-Remote-Control").config || {};
-            	this.sendResponse(res, undefined, { query: query, data: thisConfig.classes ? thisConfig.classes : {} });
+                let thisConfig = this.getConfig().modules.find(m => m.module === "MMM-Remote-Control").config || {};
+                this.sendResponse(res, undefined, { query: query, data: thisConfig.classes ? thisConfig.classes : {} });
                 return;
             }
             if (query.data === "saves") {
@@ -704,15 +704,18 @@ module.exports = NodeHelper.create(Object.assign({
             let self = this;
             let opts = { timeout: 15000 };
 
-            if (["SHUTDOWN", "REBOOT"].indexOf(query.action) !== -1) {
+            switch (query.action) {
+            case "SHUTDOWN":
+            case "REBOOT":
                 this.shutdownControl(query.action, opts, res);
                 return true;
-            }
-            if (query.action === "RESTART" || query.action === "STOP") {
+
+            case "RESTART":
+            case "STOP": 
                 this.controlPm2(res, query);
                 return true;
-            }
-            if (query.action === "COMMAND") {
+
+            case "COMMAND":
                 if (this.thisConfig.customCommand && this.thisConfig.customCommand[query.command]) {
                     exec(this.thisConfig.customCommand[query.command], opts, (error, stdout, stderr) => { 
                         self.checkForExecError(error, stdout, stderr, res, { stdout: stdout });
@@ -721,73 +724,80 @@ module.exports = NodeHelper.create(Object.assign({
                     self.sendResponse(res, new Error("Command not found"), query);
                 }
                 return true;
-            }
-            if (query.action === "USER_PRESENCE") {
+
+            case "USER_PRESENCE":
                 this.sendSocketNotification("USER_PRESENCE", query.value);
                 this.userPresence = query.value;
                 this.sendResponse(res, undefined, query);
                 return true;
-            }
-            if (["MONITORON", "MONITOROFF", "MONITORTOGGLE", "MONITORSTATUS"].indexOf(query.action) !== -1) {
+
+            case "MONITORON":
+            case "MONITOROFF":
+            case "MONITORTOGGLE":
+            case "MONITORSTATUS":
                 this.monitorControl(query.action, opts, res);
                 return true;
-            }
-            if (query.action === "HIDE" || query.action === "SHOW" || query.action === "TOGGLE") {
+
+            case "HIDE":
+            case "SHOW":
+            case "TOGGLE":
                 self.sendSocketNotification(query.action, query);
                 self.sendResponse(res);
                 return true;
-            }
-            if (query.action === "BRIGHTNESS") {
+
+            case "BRIGHTNESS":
                 self.sendResponse(res);
                 self.sendSocketNotification(query.action, query.value);
                 return true;
-            }
-            if (query.action === "SAVE") {
+
+            case "SAVE":
                 self.sendResponse(res);
                 self.callAfterUpdate(function() { self.saveDefaultSettings(); });
                 return true;
-            }
-            if (query.action === "MODULE_DATA") {
+
+            case "MODULE_DATA":
                 self.callAfterUpdate(function() {
-                    self.sendResponse(res, undefined, self.configData);
+                self.sendResponse(res, undefined, self.configData);
                 });
                 return true;
-            }
-            if (query.action === "INSTALL") {
+
+            case "INSTALL":
                 self.installModule(query.url, res, query);
                 return true;
-            }
-            if (query.action === "REFRESH") {
+
+            case "REFRESH":
                 self.sendResponse(res);
                 self.sendSocketNotification(query.action);
                 return true;
-            }
-            if (query.action === "HIDE_ALERT") {
+
+            case "HIDE_ALERT":
                 self.sendResponse(res);
                 self.sendSocketNotification(query.action);
                 return true;
-            }
-            if (query.action === "SHOW_ALERT") {
-                self.sendResponse(res);
 
-                let type = query.type ? query.type : "alert";
-                let title = query.title ? query.title : "Note";
-                let message = query.message ? query.message : "Attention!";
-                let timer = query.timer ? query.timer : 4;
+            case "SHOW_ALERT":
+                {
+                    self.sendResponse(res);
 
-                self.sendSocketNotification(query.action, {
-                    type: type,
-                    title: title,
-                    message: message,
-                    timer: timer * 1000
-                });
-                return true;
-            }
-            if (query.action === "UPDATE") {
+                    let type = query.type ? query.type : "alert";
+                    let title = query.title ? query.title : "Note";
+                    let message = query.message ? query.message : "Attention!";
+                    let timer = query.timer ? query.timer : 4;
+
+                    self.sendSocketNotification(query.action, {
+                        type: type,
+                        title: title,
+                        message: message,
+                        timer: timer * 1000
+                    });
+                    return true;
+                }
+
+            case "UPDATE":
                 self.updateModule(decodeURI(query.module), res);
                 return true;
-            }
-            if (query.action === 'NOTIFICATION') {
+
+            case "NOTIFICATION":
                 try {
                     let payload = {}; // Assume empty JSON-object if no payload is provided
                     if (typeof query.payload === 'undefined') {
@@ -809,30 +819,34 @@ module.exports = NodeHelper.create(Object.assign({
                     this.sendResponse(res, err, { reason: err.message });
                     return true;
                 }
-            }
-            if (query.action === "MANAGE_CLASSES") {
-            	if (!query.payload || !query.payload.classes || !this.thisConfig || !this.thisConfig.classes) return;
-                let classes = [];
-                switch (typeof query.payload.classes) {
-                    case 'string': classes.push(this.thisConfig.classes[query.payload.classes]); break;
-                    case 'object': query.payload.classes.forEach((t)=>classes.push(this.thisConfig.classes[t]))
-                }
-                classes.forEach((cl)=>{
-                    for(const act in cl) {
-                        if (["SHOW","HIDE","TOGGLE"].includes(act.toUpperCase())) {
-                            if(typeof cl[act] == 'string') this.sendSocketNotification(act.toUpperCase(),{ module: cl[act]});
-                            else {
-                                cl[act].forEach((t)=>{
-                                    this.sendSocketNotification(act.toUpperCase(),{ module: t});
-                                })
+
+            case "MANAGE_CLASSES":
+                {
+                    if (!query.payload || !query.payload.classes || !this.thisConfig || !this.thisConfig.classes) return;
+                    let classes = [];
+                    switch (typeof query.payload.classes) {
+                        case 'string': classes.push(this.thisConfig.classes[query.payload.classes]); break;
+                        case 'object': query.payload.classes.forEach((t)=>classes.push(this.thisConfig.classes[t]))
+                    }
+                    classes.forEach((cl)=>{
+                        for(const act in cl) {
+                            if (["SHOW","HIDE","TOGGLE"].includes(act.toUpperCase())) {
+                                if(typeof cl[act] == 'string') this.sendSocketNotification(act.toUpperCase(),{ module: cl[act]});
+                                else {
+                                    cl[act].forEach((t)=>{
+                                        this.sendSocketNotification(act.toUpperCase(),{ module: t});
+                                    })
+                                }
                             }
                         }
-                    }
-                })
-            	this.sendResponse(res);
-            	return;
-            }
-            if (["MINIMIZE", "TOGGLEFULLSCREEN", "DEVTOOLS"].indexOf(query.action) !== -1) {
+                    })
+                    this.sendResponse(res);
+                    return true;
+                }
+
+            case "MINIMIZE":
+            case "TOGGLEFULLSCREEN":
+            case "DEVTOOLS":
                 try {
                     let electron = require("electron").BrowserWindow;
                     if (!electron) { throw "Could not get Electron window instance."; }
@@ -845,37 +859,24 @@ module.exports = NodeHelper.create(Object.assign({
                             win.setFullScreen(!win.isFullScreen());
                             break;
                         case "DEVTOOLS":
-                        	if (win.webContents.isDevToolsOpened()) win.webContents.closeDevTools();
+                            if (win.webContents.isDevToolsOpened()) win.webContents.closeDevTools();
                             else win.webContents.openDevTools();
                             break;
-                        default:
                     }
                     this.sendResponse(res);
                 } catch (err) {
                     this.sendResponse(res, err);
                 }
-                return;
-            }
-            if (query.action === "DELAYED") {
-                /* Expects a nested query object 
-                 *   {
-                 *       action: "DELAYED",
-                 *       did: "SOME_UNIQUE_ID",
-                 *       timeout: 10000,  // Optional; Default 10000ms
-                 *       abort: false, // Optional; send to cancel
-                 *       query: {
-                 *           action: "SHOW_ALERT",
-                 *           title: "Delayed Alert!",
-                 *           message: "This is a delayed alert test."
-                 *       }
-                 *   }
-                 * Resending with same ID resets delay, unless abort:true
-                 */
+                return true;
+
+            case "DELAYED":
                 this.delayedQuery(query, res);
-                return;
+                return true;
+
+            default:
+                self.sendResponse(res, new Error(`Invalid Option: ${query.action}`));
+                return false;
             }
-            self.sendResponse(res, new Error(`Invalid Option: ${ query.action }`));
-            return false;
         },
 
         installModule(url, res, data) {
@@ -941,12 +942,12 @@ module.exports = NodeHelper.create(Object.assign({
                                 // success part
                                 self.readModuleData();
                                 fs.readdir(path, function(err, files) {
-                                	if (files.includes("CHANGELOG.md")) {
-                                		let chlog = fs.readFileSync(path+"/CHANGELOG.md", 'utf-8')
-                                		self.sendResponse(res, undefined, { code: "restart", info: name + " updated.", chlog: chlog });
-                                	} else {
-                                		self.sendResponse(res, undefined, { code: "restart", info: name + " updated."});
-                                	}
+                                    if (files.includes("CHANGELOG.md")) {
+                                        let chlog = fs.readFileSync(path+"/CHANGELOG.md", 'utf-8')
+                                        self.sendResponse(res, undefined, { code: "restart", info: name + " updated.", chlog: chlog });
+                                    } else {
+                                        self.sendResponse(res, undefined, { code: "restart", info: name + " updated."});
+                                    }
                                 })
                                 //var chlog = fs.readFileSync(path+"/CHANGELOG.md")
                                 //self.sendResponse(res, undefined, { code: "restart", info: name + " updated.", chlog: "" });
@@ -1130,16 +1131,16 @@ module.exports = NodeHelper.create(Object.assign({
                 }
             }
             if (notification === "UNDO_CONFIG") {
-            	let backupHistorySize = 5;
-            	let iteration = -1
+                let backupHistorySize = 5;
+                let iteration = -1
 
                 for (let i = backupHistorySize - 1; i > 0; i--) {
                     let backupPath = path.resolve("config/config.js.backup" + i);
                     try {
                         let stats = fs.statSync(backupPath);
                         if(stats.mtime.toISOString()==payload) {
-                        	iteration = i
-                        	i = -1
+                            iteration = i
+                            i = -1
                         }
                     } catch (error) {
                         Log.debug("Error: " + error);
@@ -1147,13 +1148,13 @@ module.exports = NodeHelper.create(Object.assign({
                     }
                 }
                 if(iteration<0) {
-                	this.answerGet({data: "saves"}, { isSocket: true })
-                	return
+                    this.answerGet({data: "saves"}, { isSocket: true })
+                    return
                 }
                 let backupPath = path.resolve("config/config.js.backup" + iteration);
-            	let req = require(backupPath)
-            	
-            	this.answerPost({ data: "config" }, { body: req }, { isSocket: true });
+                let req = require(backupPath)
+                
+                this.answerPost({ data: "config" }, { body: req }, { isSocket: true });
             }
             if (notification === "NEW_CONFIG") {
                 this.answerPost({ data: "config" }, { body: payload }, { isSocket: true });

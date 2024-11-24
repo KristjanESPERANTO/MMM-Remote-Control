@@ -143,8 +143,8 @@ module.exports = {
         });
 
         this.expressRouter.route([
-        	'/saves',
-        	'/classes',
+            '/saves',
+            '/classes',
             '/module/installed',
             '/module/available',
             '/brightness',
@@ -178,10 +178,10 @@ module.exports = {
                 let classes = self.getConfig().modules.find(m => m.module === "MMM-Remote-Control").config || {};
                 const val = decodeURIComponent(req.params.value)
                 if(classes.classes && classes.classes[val]) {
-                	self.executeQuery({ action: "MANAGE_CLASSES", payload: { classes: req.params.value} }, res);
+                    self.executeQuery({ action: "MANAGE_CLASSES", payload: { classes: req.params.value} }, res);
                 } else {
-               		res.status(400).json({ success: false, message: `Invalid value ${val} provided in request. Use /api/classes to see actual values` });
-               	}
+                       res.status(400).json({ success: false, message: `Invalid value ${val} provided in request. Use /api/classes to see actual values` });
+                   }
             });
 
         this.expressRouter.route('/command/:value')
@@ -281,7 +281,7 @@ module.exports = {
                         actionName = req.body.monitor.toUpperCase();
                     }
                 } else {
-                        actionName = req.params.action ? req.params.action.toUpperCase() : "STATUS";
+                        actionName = (req.params.action || "STATUS").toUpperCase();
                 }
                 this.executeQuery(this.checkDelay({ action: `MONITOR${actionName}` }, req), res);
             });
@@ -468,6 +468,11 @@ module.exports = {
         return;
     },
 
+    /**
+     * Check if the API is initialized before processing any requests.
+     * @param {Response} res - Express response object
+     * @returns {boolean} - true if initialized, false otherwise
+     */
     checkInitialized(res) {
         if (!this.initialized) {
             this.sendResponse(res, "Not initialized, have you opened or refreshed your browser since the last time you started MagicMirror²?");
