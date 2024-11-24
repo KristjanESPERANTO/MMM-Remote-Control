@@ -1,15 +1,8 @@
-/* MagicMirror²
- * Module Extension: Remote Control API
- *
- * By shbatm
- * MIT Licensed.
- */
+/* global Module */
 
 const path = require("path");
 const url = require("url");
-const fs = require("fs");
-const os = require("os");
-const uuid = require("uuid/v4");
+const { v4: uuid } = require('uuid');
 const bodyParser = require("body-parser");
 const express = require("express");
 
@@ -20,7 +13,7 @@ module.exports = {
      */
     getApiKey() {
         let thisConfig = this.configOnHd.modules.find(x => x.module === "MMM-Remote-Control");
-        if (typeof "thisConfig" !== "undefined" &&
+        if (typeof thisConfig !== "undefined" &&
             "config" in thisConfig){
             if ("apiKey" in thisConfig.config &&
                 thisConfig.config.apiKey !== '') {
@@ -48,7 +41,7 @@ module.exports = {
         if (!this.configOnHd) { return undefined; }
 
         let getActions = function(content) {
-            let re = /notification \=\=\=? (?:"|')([A-Z_-]+?)(?:"|')|case (?:"|')([A-Z_-]+)(?:"|')/g;
+            let re = /notification ===? (?:"|')([A-Z_-]+?)(?:"|')|case (?:"|')([A-Z_-]+)(?:"|')/g;
             let availableActions = [];
             if (re.test(content)) {
                 content.match(re).forEach((match) => {
@@ -194,7 +187,6 @@ module.exports = {
         this.expressRouter.route('/command/:value')
             .get((req, res) => {
                 if (!this.apiKey && this.secureEndpoints) return res.status(403).json({ success: false, message: "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message" });
-                const val = decodeURIComponent(req.params.value)
                 self.executeQuery({ action: "COMMAND", command: req.params.value }, res);
             });
 
@@ -376,7 +368,7 @@ module.exports = {
 
         if (["SHOW", "HIDE", "FORCE", "TOGGLE", "DEFAULTS"].indexOf(action) !== -1) { // /api/modules part of the code
             if (action === "DEFAULTS") {
-                this.answerGet({ data: "defaultConfig", module: mod.name }, res);
+                this.answerGet({ data: "defaultConfig", module: modData[0].name }, res);
                 return;
             }
 
@@ -410,7 +402,7 @@ module.exports = {
 
         if (action) {
             if ("method" in action && action.method !== req.method) {
-                res.status(400).json({ success: false, info: `Method ${req.method} is not allowed for ${moduleName}/${req.params.action}.` });
+                res.status(400).json({ success: false, info: `Method ${req.method} is not allowed for ${modData[0].name}/${req.params.action}.` });
                 return;
             }
             this.answerNotifyApi(req, res, action);

@@ -17,7 +17,6 @@ const exec = require("child_process").exec;
 const Log = require("logger");
 const os = require("os");
 const simpleGit = require("simple-git");
-const _ = require("lodash");
 
 let defaultModules = require(path.resolve(__dirname + "/../../modules/default/defaultmodules.js"));
 
@@ -116,6 +115,7 @@ module.exports = NodeHelper.create(Object.assign({
                     }
                 }
             } catch (e) {
+                Log.error("Error loading module:", e);
                 if (e.code == "ENOENT") {
                     console.error("MMM-Remote-Control WARNING! Could not find config file. Please create one. Starting with default configuration.");
                     this.configOnHd = defaults;
@@ -187,7 +187,6 @@ module.exports = NodeHelper.create(Object.assign({
         },
 
         updateModuleList(force) {
-            let self = this;
             let downloadModules = require('./scripts/download_modules');
             downloadModules({
                 force: force,
@@ -228,7 +227,7 @@ module.exports = NodeHelper.create(Object.assign({
                 // now check for installed modules
                 fs.readdir(path.resolve(__dirname + "/.."), function(err, files) {
                     let installedModules = files.filter(f => ['node_modules', 'default', 'README.md'].indexOf(f) === -1);
-                    installedModules.forEach((dir, i, a) => {
+                    installedModules.forEach((dir, i) => {
                         self.addModule(dir, (i === installedModules.length - 1));
                     });
                 });
@@ -272,10 +271,10 @@ module.exports = NodeHelper.create(Object.assign({
                     self.loadModuleDefaultConfig(currentModule, modulePath, lastOne);
 
                     // check for available updates
-                    let stat;
                     try {
-                        stat = fs.statSync(path.join(modulePath, '.git'));
-                    } catch (err) {
+                        fs.statSync(path.join(modulePath, '.git'));
+                    } catch (error) {
+                        Log.debug("Error: " + error);
                         // Error when directory .git doesn't exist
                         // This module is not managed with git, skip
                         return;
@@ -300,7 +299,8 @@ module.exports = NodeHelper.create(Object.assign({
                                 baseUrl = baseUrl.replace(".git", "").replace("github.com:", "github.com/");
                                 // if cloned with ssh
                                 currentModule.url = baseUrl.replace("git@", "https://");
-                            } catch (e) {
+                            } catch (error) {
+                                Log.debug("Error: " + error);
                                 // Something happened. Skip it.
                                 return;
                             }
@@ -323,7 +323,7 @@ module.exports = NodeHelper.create(Object.assign({
                 fs.writeFileSync(tempFilename, newContent, 'utf8');
                 
                 /* Defaults are stored when Module.register is called during require(filename); */
-                const jsFile = require(tempFilename);
+                require(tempFilename);
 
                 // Unlink the temporary file
                 fs.unlinkSync(tempFilename);
@@ -402,7 +402,7 @@ module.exports = NodeHelper.create(Object.assign({
             let defaultConfig = require(__dirname + "/../../js/defaults.js");
 
             for (let key in defaultConfig) {
-                if (defaultConfig.hasOwnProperty(key) && config && config.hasOwnProperty(key) && _.isEqual(defaultConfig[key], config[key])) {
+                if (Object.prototype.hasOwnProperty.call(defaultConfig, key) && config && Object.prototype.hasOwnProperty.call(config, key) && JSON.stringify(defaultConfig[key]) === JSON.stringify(config[key])) {
                     delete config[key];
                 }
             }
@@ -414,16 +414,16 @@ module.exports = NodeHelper.create(Object.assign({
                     def = {};
                 }
                 for (let key in def) {
-                    if (def.hasOwnProperty(key) && current.config.hasOwnProperty(key) && _.isEqual(def[key], current.config[key])) {
+                    if (Object.prototype.hasOwnProperty.call(def, key) && Object.prototype.hasOwnProperty.call(current.config, key) && JSON.stringify(def[key]) === JSON.stringify(current.config[key])) {
                         delete current.config[key];
                     }
                 }
-                // Log.log(current.config);
-                if (current.config === {}) {
+                Log.debug(current.config);
+                if (Object.keys(current.config).length === 0) {
                     delete current[config];
                     continue;
                 }
-                // Log.log(current);
+                Log.debug(current);
             }
 
             return config;
@@ -547,7 +547,8 @@ module.exports = NodeHelper.create(Object.assign({
                     try {
                         let stats = fs.statSync(backupPath);
                         times.push(stats.mtime)
-                    } catch (e) {
+                    } catch (error) {
+                        Log.debug("Error: " + error);
                         continue;
                     }
                 }
@@ -664,7 +665,7 @@ module.exports = NodeHelper.create(Object.assign({
                         return;
                     });
                     break;
-                case "MONITORTOGGLE": exec(monitorStatusCommand, opts, (error, stdout, stderr) => {
+                case "MONITORTOGGLE": exec(monitorStatusCommand, opts, (error, stdout) => {
                         status = offArr.indexOf(stdout.trim()) !== -1 ? "off" : "on";
                         if(status === "on") this.monitorControl("MONITOROFF", opts, res);
                         else this.monitorControl("MONITORON", opts, res);
@@ -684,7 +685,7 @@ module.exports = NodeHelper.create(Object.assign({
             }
         },
 
-        shutdownControl(action, opts, res) {
+        shutdownControl(action, opts) {
             let shutdownCommand = (this.initialized && "shutdownCommand" in this.thisConfig.customCommand) ?
                 this.thisConfig.customCommand.shutdownCommand :
                 "sudo shutdown -h now";
@@ -880,7 +881,7 @@ module.exports = NodeHelper.create(Object.assign({
         installModule(url, res, data) {
             let self = this;
 
-            simpleGit(path.resolve(__dirname + "/..")).clone(url, path.basename(url), function(error, result) {
+            simpleGit(path.resolve(__dirname + "/..")).clone(url, path.basename(url), function(error) {
                 if (error) {
                     Log.error(error);
                     self.sendResponse(res, error);
@@ -912,7 +913,7 @@ module.exports = NodeHelper.create(Object.assign({
                 if (self.modulesAvailable) {
                     let modData = self.modulesAvailable.find(m => m.longname === module);
                     if (modData === undefined) {
-                        this.sendResponse(res, new Error("Unknown Module"), { info: modules });
+                        this.sendResponse(res, new Error("Unknown Module"), { info: module });
                         return;
                     }
 
@@ -983,13 +984,13 @@ module.exports = NodeHelper.create(Object.assign({
 
                 switch (actionName) {
                     case 'restart':
-                        pm2.restart(processName, (err, apps) => {
+                        pm2.restart(processName, (err) => {
                             this.sendResponse(res, undefined, { action: actionName, processName: processName});
                             if (err) { this.sendResponse(res, err); }
                         });
                         break;
                     case 'stop':
-                        pm2.stop(processName, (err, apps) => {
+                        pm2.stop(processName, (err) => {
                             this.sendResponse(res, undefined, { action: actionName, processName: processName });
                             pm2.disconnect();
                             if (err) { this.sendResponse(res, err); }
@@ -1140,7 +1141,8 @@ module.exports = NodeHelper.create(Object.assign({
                         	iteration = i
                         	i = -1
                         }
-                    } catch (e) {
+                    } catch (error) {
+                        Log.debug("Error: " + error);
                         continue;
                     }
                 }
@@ -1172,7 +1174,7 @@ module.exports = NodeHelper.create(Object.assign({
             /* API EXTENSION -- added v2.0.0 */
             if (notification === "REGISTER_API") {
                 if ("module" in payload) {
-                    if ("actions" in payload && payload.actions !== {}) {
+                    if ("actions" in payload && Object.keys(payload.actions).length > 0) {
                         this.externalApiRoutes[payload.path] = payload;
                     } else {
                         // Blank actions means the module has requested to be removed from API

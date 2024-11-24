@@ -1,4 +1,4 @@
-/* global $ */
+/* global $ showdown MMSocket */
 
 // main javascript file for the remote control page
 
@@ -228,14 +228,14 @@ let Remote = {
         let self = this;
 
         let slider = document.getElementById("brightness-slider");
-        slider.addEventListener("change", function(event) {
+        slider.addEventListener("change", function() {
             self.sendSocketNotification("REMOTE_ACTION", { action: "BRIGHTNESS", value: slider.value });
         }, false);
 
         let input = document.getElementById("add-module-search");
         let deleteButton = document.getElementById("delete-search-input");
 
-        input.addEventListener("input", function(event) {
+        input.addEventListener("input", function() {
             self.filter(input.value);
             if (input.value === "") {
                 deleteButton.style.display = "none";
@@ -244,7 +244,7 @@ let Remote = {
             }
         }, false);
 
-        deleteButton.addEventListener("click", function(event) {
+        deleteButton.addEventListener("click", function() {
             input.value = "";
             self.filter(input.value);
             deleteButton.style.display = "none";
@@ -376,7 +376,7 @@ let Remote = {
 
         let symbol;
         let text;
-        let close = true;
+        let onClick = false;
         if (status === "loading") {
             symbol = "fa-spinner fa-pulse";
             text = this.translate("LOADING");
@@ -456,7 +456,9 @@ let Remote = {
             this.savedData.moduleAvailable[result.index].installed = true;
             this.createAddingPopup(result.index);
         } else {
-            symbol.className = "fa fa-fw fa-exclamation-circle";
+            let bgElement = document.getElementById("install-module-" + result.index);
+            bgElement.firstChild.className = "fa fa-fw fa-exclamation-circle";
+            let text = document.createElement("span");
             text.innerHTML = " " + this.translate("ERROR");
         }
     },
@@ -518,7 +520,8 @@ let Remote = {
                 self.pendingCallback(parent, result.data);
                 delete self.pendingCallback;
             }
-        } catch (e) {
+        } catch (error) {
+            console.log("[MMM-Remote-Control] Error loading list: " + error);
             self.show(emptyIndicator);
         }
     },
@@ -568,7 +571,7 @@ let Remote = {
         let outerSpan = document.createElement("span");
         outerSpan.className = "stack fa-fw";
 
-        spanClasses = [
+        let spanClasses = [
             "fa fa-fw fa-toggle-on outer-label fa-stack-1x",
             "fa fa-fw fa-toggle-off outer-label fa-stack-1x",
             "fa fa-fw fa-lock inner-small-label fa-stack-1x"
@@ -584,8 +587,6 @@ let Remote = {
     },
 
     loadBrightness() {
-        let self = this;
-
         console.log("Load brightness...");
         this.sendSocketNotification("REMOTE_ACTION", { data: "brightness" });
     },
@@ -714,7 +715,7 @@ let Remote = {
             }
             select.appendChild(option);
         }
-        select.addEventListener("change", function(event) {
+        select.addEventListener("change", function() {
             let newType = select.options[select.selectedIndex].innerHTML.toLowerCase();
             if (previousType !== newType) {
                 self.recreateConfigElement(key, previousType, newType);
@@ -722,7 +723,7 @@ let Remote = {
                 parent.replaceChild(oldElement, select);
             }
         }, false);
-        select.addEventListener("blur", function(event) {
+        select.addEventListener("blur", function() {
             parent.replaceChild(oldElement, select);
         }, false);
         return select;
@@ -788,7 +789,7 @@ let Remote = {
         return input;
     },
 
-    createVisualCheckbox(key, wrapper, input, className, value) {
+    createVisualCheckbox(key, wrapper, input, className) {
         let visualCheckbox = document.createElement("span");
         visualCheckbox.className = "visual-checkbox fa fa-fw " + className;
         wrapper.appendChild(visualCheckbox);
@@ -989,7 +990,7 @@ let Remote = {
         }
         for (let i = 0; i < keys.length; i++) {
             let key = keys[i];
-            if (dataToEdit.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(dataToEdit, key)) {
                 wrapper.appendChild(this.createObjectGUI(path + "/" + key, key, dataToEdit[key]));
             }
         }
@@ -1003,7 +1004,7 @@ let Remote = {
     appendConfigMenu(index, wrapper) {
         let self = this;
 
-        let menuElement = self.createSymbolText("small fa fa-fw fa-navicon", self.translate("MENU"), function(event) {
+        let menuElement = self.createSymbolText("small fa fa-fw fa-navicon", self.translate("MENU"), function() {
             let elements = document.getElementsByClassName("sub-menu");
             for (let i = 0; i < elements.length; i++) {
                 let element = elements[i];
@@ -1020,15 +1021,15 @@ let Remote = {
         let menuDiv = document.createElement("div");
         menuDiv.className = "fixed-size sub-menu hidden";
 
-        let help = self.createSymbolText("fa fa-fw fa-question-circle", self.translate("HELP"), function(event) {
+        let help = self.createSymbolText("fa fa-fw fa-question-circle", self.translate("HELP"), function() {
             window.open("config-help.html?module=" + self.currentConfig.module, "_blank");
         });
         menuDiv.appendChild(help);
-        let undo = self.createSymbolText("fa fa-fw fa-undo", self.translate("RESET"), function(event) {
+        let undo = self.createSymbolText("fa fa-fw fa-undo", self.translate("RESET"), function() {
             self.createConfigPopup(index);
         });
         menuDiv.appendChild(undo);
-        let save = self.createSymbolText("fa fa-fw fa-save", self.translate("SAVE"), function(event) {
+        let save = self.createSymbolText("fa fa-fw fa-save", self.translate("SAVE"), function() {
             self.savedData.config.modules[index] = self.getModuleConfigFromUI();
             self.changedModules.push(index);
             let parent = document.getElementById("edit-module-" + index).parentNode;
@@ -1072,7 +1073,7 @@ let Remote = {
             for (let k = 1; k < splitPath.length - 1; k++) {
                 parent = this.navigate(parent, splitPath[k]);
             }
-            let name = splitPath[k];
+            let name = splitPath[splitPath.length - 1];
             if (this.hasClass(elements[i], "null")) {
                 this.setValue(parent, name, null);
                 continue;
@@ -1219,7 +1220,7 @@ let Remote = {
     	console.log("Loading classes...");
     	this.loadList("classes", "classes", function(parent, classes) {
     		for(const i in classes) {
-    			$node = $("<div>").attr("id", "classes-before-result").attr("hidden", "true")
+    			let $node = $("<div>").attr("id", "classes-before-result").attr("hidden", "true")
     			$('#classes-results').append($node)
     			let content = Object.assign({}, {
 						id: i,
@@ -1268,7 +1269,7 @@ let Remote = {
         footer.className = "fixed-size sub-menu";
 
         if (data.installed) {
-            let add = self.createSymbolText("fa fa-fw fa-plus", self.translate("ADD_THIS"), function(event) {
+            let add = self.createSymbolText("fa fa-fw fa-plus", self.translate("ADD_THIS"), function() {
                 self.closePopup();
                 self.addModule = data.longname;
                 window.location.hash = "settings-menu";
@@ -1280,14 +1281,14 @@ let Remote = {
             let statusElement = self.createSymbolText("fa fa-fw fa-check-circle", self.translate("INSTALLED"));
             footer.appendChild(statusElement);
         } else {
-            let statusElement = self.createSymbolText("fa fa-fw fa-download", self.translate("DOWNLOAD"), function(event) {
+            let statusElement = self.createSymbolText("fa fa-fw fa-download", self.translate("DOWNLOAD"), function() {
                 self.install(data.url, index);
             });
             statusElement.id = "download-button";
             footer.appendChild(statusElement);
         }
 
-        let githubElement = self.createSymbolText("fa fa-fw fa-github", self.translate("CODE_LINK"), function(event) {
+        let githubElement = self.createSymbolText("fa fa-fw fa-github", self.translate("CODE_LINK"), function() {
             window.open(data.url, "_blank");
         });
         footer.appendChild(githubElement);
@@ -1421,8 +1422,6 @@ let Remote = {
     },
 
     undoConfigMenu() {
-    	let self = this;
-
         if (this.saving) {
             return;
         }
@@ -1450,8 +1449,6 @@ let Remote = {
     },
 
     undoConfig(date) {
-    	let self = this;
-
         // prevent saving before current saving is finished
         if (this.saving) {
             return;
@@ -1462,10 +1459,7 @@ let Remote = {
         this.sendSocketNotification("UNDO_CONFIG", date);
     },
 
-    saveConfig() {
-        let self = this;
-
-        // prevent saving before current saving is finished
+    saveConfig() {        // prevent saving before current saving is finished
         if (this.saving) {
             return;
         }
@@ -1505,7 +1499,7 @@ let Remote = {
 
     createMenuElement(content, menu, $insertAfter) {
         if (!content) { return; }
-        $item = $("<div>").attr("id", `${content.id}-button`).addClass(`menu-element button ${menu}-menu`);
+        let $item = $("<div>").attr("id", `${content.id}-button`).addClass(`menu-element button ${menu}-menu`);
         let $mcmIcon = $('<span>').addClass(`fa fa-fw fa-${content.icon}`).attr("aria-hidden", "true");
         let $mcmText = $('<span>').addClass('text').text(content.text);
         if (content.icon) $item.append($mcmIcon)
@@ -1571,7 +1565,7 @@ let Remote = {
                 window.location.hash = "main-menu";
             }
         }
-        let $mcmBtn = this.createMenuElement(content, "main", $("#alert-button"));
+        this.createMenuElement(content, "main", $("#alert-button"));
     }
 };
 

@@ -61,7 +61,7 @@ let downloadModules = {
                 this.config.callback("ERROR_401");
                 return;
             } else {
-                console.error("MODULE LIST ERROR: Could not load data.", statusText);
+                console.error("MODULE LIST ERROR: Could not load data.", response.statusText);
                 this.config.callback("ERROR_LOADING_DATA");
                 return;
             }
@@ -71,7 +71,7 @@ let downloadModules = {
             let modules = this.parseList(body);
             let json = JSON.stringify(modules, undefined, 2);
             let jsonPath = this.config.modulesFile;
-            fs.writeFile(jsonPath, json, "utf8", (err, data) => {
+            fs.writeFile(jsonPath, json, "utf8", (err) => {
                 if (err) {
                     console.error("MODULE LIST ERROR: modules.json updating fail:" + err.message);
                     this.config.callback("ERROR_UPDATING");

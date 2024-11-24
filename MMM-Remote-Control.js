@@ -1,4 +1,4 @@
-/* global Module, Log, MM, config */
+/* global Module, Log, MM */
 
 /* MagicMirror²
  * Module: Remote Control
@@ -33,7 +33,7 @@ Module.register("MMM-Remote-Control", {
     },
 
     notificationReceived(notification, payload, sender) {
-        // Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+        Log.debug(this.name + " received a module notification: " + notification + " from sender: " + sender);
         if (notification === "DOM_OBJECTS_CREATED") {
             this.sendSocketNotification("REQUEST_DEFAULT_SETTINGS");
             this.sendCurrentData();
@@ -99,7 +99,7 @@ Module.register("MMM-Remote-Control", {
             let options = { lockString: this.identifier };
 
             modules.enumerate(function(module) {
-                if (hideModules.hasOwnProperty(module.identifier)) {
+                if (Object.prototype.hasOwnProperty.call(hideModules, module.identifier)) {
                     module.hide(0, options);
                 }
             });
@@ -262,8 +262,6 @@ Module.register("MMM-Remote-Control", {
     },
 
     sendCurrentData() {
-        let self = this;
-
         let modules = MM.getModules();
         let currentModuleData = [];
         modules.enumerate(function(module) {
