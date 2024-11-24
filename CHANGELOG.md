@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Added GitHub workflow for linting and spell checking on every push and pull request (#310).
 - Added Turkish language (#305)
 
+### Fixed
+
+- Fix URLs
+
+### Changed
+
+- Replace `node-fetch` by internal fetch API
+
 ## [2.4.0] - 2024-10-08
 
 ### Fixed
