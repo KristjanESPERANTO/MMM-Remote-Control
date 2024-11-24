@@ -16,7 +16,7 @@ const path = require("path");
 const fs = require("fs");
 const util = require("util");
 
-var downloadModules = {
+const downloadModules = {
     defaults: {
         modulesFile: path.resolve(__dirname, "../modules.json"),    // Path to modules file
         sourceUrl: 'https://raw.githubusercontent.com/wiki/MagicMirrorOrg/MagicMirror/3rd-Party-Modules.md', // Source url
@@ -33,12 +33,12 @@ var downloadModules = {
     },
 
     parseList: function(content) {
-        let re = /\|\s?\[(.*?)\]\((.*?)\)\s?\|(.*?)\|(.*)\|?/g;
-        let modules = [];
+        const re = /\|\s?\[(.*?)\]\((.*?)\)\s?\|(.*?)\|(.*)\|?/g;
+        const modules = [];
 
         content.match(re).forEach((line) => {
             line.replace(re, (match, name, url, author, desc) => {
-                let modDetail = {
+                const modDetail = {
                     longname: name.trim(),
                     id: url.replace(".git", "").replace(/.*\/(.*?\/.*?)$/, "$1").trim(),
                     url: url.replace(".git", "").trim(),
@@ -69,9 +69,9 @@ var downloadModules = {
         })
         .then((response) => response.text())
         .then((body) => {
-            let modules = this.parseList(body);
-            var json = JSON.stringify(modules, undefined, 2);
-            var jsonPath = this.config.modulesFile;
+            const modules = this.parseList(body);
+            const json = JSON.stringify(modules, undefined, 2);
+            const jsonPath = this.config.modulesFile;
             fs.writeFile(jsonPath, json, "utf8", (err, data) => {
                 if (err) {
                     console.error("MODULE LIST ERROR: modules.json updating fail:" + err.message);
@@ -91,9 +91,9 @@ var downloadModules = {
 
     checkLastModified() {
         fs.stat(this.config.modulesFile, (err, stats) => {
-            let mtime = Math.round(new Date(util.inspect(stats.mtime)).getTime() / 1000);
-            let updatedAfter = new Date(Math.round(new Date().getTime() / 1000) - this.config.refreshRate).getTime();
-            let needsUpdate = mtime <= updatedAfter;
+            const mtime = Math.round(new Date(util.inspect(stats.mtime)).getTime() / 1000);
+            const updatedAfter = new Date(Math.round(new Date().getTime() / 1000) - this.config.refreshRate).getTime();
+            const needsUpdate = mtime <= updatedAfter;
             if (needsUpdate || this.config.force) { 
                 this.getPackages(); 
             } else {

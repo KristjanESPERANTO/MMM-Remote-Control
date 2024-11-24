@@ -33,8 +33,9 @@ const config = [
       "no-undef": "warn",
       "no-unused-vars": "warn",
       "no-useless-escape": "warn",
-      "no-var": "warn",
+      "no-var": "error",
       "one-var": "off",
+      "prefer-const": "error",
       "sort-keys": "off",
       "strict": "off"
     }
