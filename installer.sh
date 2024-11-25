@@ -146,7 +146,7 @@ fi
 
 # Get an UUID to use as an API key
 NODE_BIN=$(which node)
-APIKEY=$($NODE_BIN -e 'console.log(require("uuid/v4")().replace(/-/g, ""));');
+APIKEY=$($NODE_BIN -e 'const { v4: uuid } = require("uuid");console.log(uuid().replace(/-/g, ""));');
 
 echo ""
 if check_no "Do you want to view instructions on how to configure the module?"; then
