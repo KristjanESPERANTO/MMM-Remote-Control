@@ -1,3 +1,5 @@
+/* global Module */
+
 /* MagicMirror²
  * Module Extension: Remote Control API
  *
@@ -7,8 +9,6 @@
 
 const path = require("path");
 const url = require("url");
-const fs = require("fs");
-const os = require("os");
 const uuid = require("uuid/v4");
 const bodyParser = require("body-parser");
 const express = require("express");

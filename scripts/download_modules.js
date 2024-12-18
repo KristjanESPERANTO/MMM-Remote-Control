@@ -2,7 +2,7 @@
  * Module: Remote Control
  *
  * Usage: 
- *   var downloadModules = require('./download_modules');
+ *   let downloadModules = require('./download_modules');
  *   downloadModules({ callback: function(result) { console.log(result); }});
  *      downloadModules accepts a CONFIG object which will overwrite the values
  *        in the defaults section below.
@@ -62,7 +62,7 @@ const downloadModules = {
                 this.config.callback("ERROR_401");
                 return;
             } else {
-                console.error("MODULE LIST ERROR: Could not load data.", statusText);
+                console.error("MODULE LIST ERROR: Could not load data.", response.statusText);
                 this.config.callback("ERROR_LOADING_DATA");
                 return;
             }

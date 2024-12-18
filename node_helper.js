@@ -14,8 +14,6 @@ const exec = require("child_process").exec;
 const Log = require("logger");
 const os = require("os");
 const simpleGit = require("simple-git");
-const bodyParser = require("body-parser");
-const express = require("express");
 const _ = require("lodash");
 
 const defaultModules = require(path.resolve(__dirname + "/../../modules/default/defaultmodules.js"));
