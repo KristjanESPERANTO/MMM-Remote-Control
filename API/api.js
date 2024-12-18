@@ -19,7 +19,7 @@ module.exports = {
      * Only checks for an API key if one is defined in the module's config section.
      */
     getApiKey() {
-        let thisConfig = this.configOnHd.modules.find(x => x.module === "MMM-Remote-Control");
+        const thisConfig = this.configOnHd.modules.find(x => x.module === "MMM-Remote-Control");
         if (typeof "thisConfig" !== "undefined" &&
             "config" in thisConfig){
             if ("apiKey" in thisConfig.config &&
@@ -47,13 +47,13 @@ module.exports = {
     getExternalApiByGuessing() {
         if (!this.configOnHd) { return undefined; }
 
-        let getActions = function(content) {
-            let re = /notification \=\=\=? (?:"|')([A-Z_-]+?)(?:"|')|case (?:"|')([A-Z_-]+)(?:"|')/g;
+        const getActions = function(content) {
+            const re = /notification \=\=\=? (?:"|')([A-Z_-]+?)(?:"|')|case (?:"|')([A-Z_-]+)(?:"|')/g;
             let m;
-            let availableActions = [];
+            const availableActions = [];
             if (re.test(content)) {
                 content.match(re).forEach((match) => {
-                    let n = match.replace(re, '$1');
+                    const n = match.replace(re, '$1');
                     if (['ALL_MODULES_STARTED',
                             'DOM_OBJECTS_CREATED',
                             'KEYPRESS',
@@ -68,17 +68,17 @@ module.exports = {
             return availableActions;
         };
 
-        let skippedModules = ['clock', 'compliments', 'MMM-Remote-Control'];
+        const skippedModules = ['clock', 'compliments', 'MMM-Remote-Control'];
 
         this.configOnHd.modules.filter(mod => skippedModules.indexOf(mod.module) === -1).forEach(mod => {
             try {
-                let modActions = getActions(Module.notificationHandler[mod.module]);
+                const modActions = getActions(Module.notificationHandler[mod.module]);
 
                 if (modActions.length > 0) {
-                    let pathGuess = mod.module.replace(/MMM-/g, '').replace(/-/g, '').toLowerCase();
+                    const pathGuess = mod.module.replace(/MMM-/g, '').replace(/-/g, '').toLowerCase();
 
                     // Generate formatted actions object
-                    let actionsGuess = {};
+                    const actionsGuess = {};
 
                     modActions.forEach(a => {
                         actionsGuess[a.replace(/[-_]/g, '').toLowerCase()] = { notification: a, guessed: true };
@@ -103,7 +103,7 @@ module.exports = {
     },
 
     createApiRoutes() {
-        var self = this;
+        const self = this;
 
         this.getApiKey();
 
@@ -128,7 +128,7 @@ module.exports = {
             if (typeof this.apiKey !== "undefined") {
                 if (!("authorization" in req.headers) || req.headers.authorization.search(/(apikey|bearer)/gi) === -1) {
                     // API Key was not provided as a header. Check the URL.
-                    var query = url.parse(req.url, true).query;
+                    const query = url.parse(req.url, true).query;
                     if ("apiKey" in query) {
                         if (query.apiKey !== this.apiKey) {
                             return res.status(401).json({ success: false, message: "Unauthorized: Wrong API Key Provided!" });
@@ -176,14 +176,14 @@ module.exports = {
             '/devtools'
         ]).get((req, res) => {
             if (!this.apiKey && this.secureEndpoints) return res.status(403).json({ success: false, message: "Forbidden: API Key Not Provided in Config! Use secureEndpoints to bypass this message" });
-            let r = req.path.split("/")[1].toUpperCase();
+            const r = req.path.split("/")[1].toUpperCase();
             console.log(req.path);
             self.executeQuery(this.checkDelay({ action: r }, req), res);
         });
 
         this.expressRouter.route('/classes/:value')
             .get((req, res) => {
-                var classes = self.getConfig().modules.find(m => m.module === "MMM-Remote-Control").config || {};
+                const classes = self.getConfig().modules.find(m => m.module === "MMM-Remote-Control").config || {};
                 const val = decodeURIComponent(req.params.value)
                 if(classes.classes && classes.classes[val]) {
                 	self.executeQuery({ action: "MANAGE_CLASSES", payload: { classes: req.params.value} }, res);
@@ -280,11 +280,11 @@ module.exports = {
         this.expressRouter.route('/monitor/:action?/:delayed?')
             .get((req, res) => {
                 if (!req.params.action) { req.params.action = "STATUS"; }
-                var actionName = req.params.action.toUpperCase();
+                const actionName = req.params.action.toUpperCase();
                 this.executeQuery(this.checkDelay({ action: `MONITOR${actionName}` }, req), res);
             })
             .post((req, res) => {
-                var actionName = "STATUS";
+                let actionName = "STATUS";
                 if (typeof req.body !== 'undefined' && "monitor" in req.body) {
                     if (["OFF", "ON", "TOGGLE"].includes(req.body.monitor.toUpperCase())) {
                         actionName = req.body.monitor.toUpperCase();
@@ -312,7 +312,7 @@ module.exports = {
         // accepts .../delay
         // defaults to a 10s delay with a random UUID as ID.
         if (req.params && req.params.delayed && req.params.delayed === "delay") {
-            let dQuery = {
+            const dQuery = {
                 action: "DELAYED",
                 did: (req.query.did) ? req.query.did : (req.body.did) ? req.body.did : uuid().replace(/-/g, ''),
                 timeout: (req.query.timeout) ? req.query.timeout : (req.body.timeout) ? req.body.timeout : 10,
@@ -325,9 +325,9 @@ module.exports = {
     },
 
     mergeData() {
-        var extApiRoutes = this.externalApiRoutes;
-        var modules = this.configData.moduleData
-        var query = {success: true, data: []};
+        const extApiRoutes = this.externalApiRoutes;
+        const modules = this.configData.moduleData
+        const query = {success: true, data: []};
         
         modules.forEach((mod) => {
             if (extApiRoutes[mod.name] === undefined) {
@@ -342,7 +342,7 @@ module.exports = {
 
     answerModuleApi(req, res) {
         if (!this.checkInitialized(res)) { return; }
-        var dataMerged = this.mergeData().data
+        const dataMerged = this.mergeData().data
         
         if (!req.params.moduleName) {
             res.json({ success: true, data: dataMerged });
@@ -373,7 +373,7 @@ module.exports = {
             return;
         }
 
-        var action = req.params.action.toUpperCase();
+        let action = req.params.action.toUpperCase();
 
         if (["SHOW", "HIDE", "FORCE", "TOGGLE", "DEFAULTS"].indexOf(action) !== -1) { // /api/modules part of the code
             if (action === "DEFAULTS") {
@@ -382,7 +382,7 @@ module.exports = {
             }
 
             if (req.params.moduleName === "all") {
-                let query = { module: "all" };
+                const query = { module: "all" };
                 if (action === "FORCE") {
                     query.action = "SHOW";
                     query.force = true;
@@ -394,7 +394,7 @@ module.exports = {
             }
 
             modData.forEach(mod => {
-                let query = { module: mod.identifier };
+                const query = { module: mod.identifier };
                 if (action === "FORCE") {
                     query.action = "SHOW";
                     query.force = true;
@@ -496,7 +496,7 @@ module.exports = {
             items: []
         };
         Object.keys(this.externalApiRoutes).forEach(r => {
-            let sub = {
+            const sub = {
                 id: "mc-" + r,
                 type: "menu",
                 icon: "bars",
@@ -504,7 +504,7 @@ module.exports = {
                 items: []
             };
             Object.keys(this.externalApiRoutes[r].actions).forEach(a => {
-                let item = {
+                const item = {
                     id: `mc-${r}-${a}`,
                     menu: "item",
                     icon: "dot-circle-o",
