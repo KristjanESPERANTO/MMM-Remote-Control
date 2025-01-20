@@ -1,6 +1,6 @@
 {
   "name": "mmm-remote-control",
-  "version": "2.5.3",
+  "version": "2.5.2",
   "description": "This module for the MagicMirror² allows you to shutdown and configure your mirror through a web browser.",
   "repository": {
     "type": "git",
@@ -33,13 +33,21 @@
     "cspell": "^8.17.2",
     "eslint": "^9.18.0",
     "eslint-plugin-import": "^2.31.0",
-    "globals": "^15.14.0"
+    "globals": "^15.14.0",
+    "lint-staged": "^15.4.1",
+    "markdownlint-cli": "^0.43.0",
+    "prettier": "^3.4.2",
+    "stylelint": "^16.13.2",
+    "stylelint-config-standard": "^37.0.0",
+    "stylelint-prettier": "^5.0.2"
   },
   "scripts": {
     "download_modules": "node ./scripts/download_modules_manually.mjs",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
+    "lint": "eslint && stylelint **/*.css && markdownlint . --ignore node_modules && prettier --check .",
+    "lint:fix": "eslint --fix && stylelint **/*.css --fix && markdownlint . --ignore node_modules --fix && prettier --write .",
     "test": "npm run lint && npm run test:spelling",
-    "test:spelling": "cspell ."
+    "test:spelling": "cspell .",
+    "prepare-release": "npm run lint:fix && npm run test:spelling",
+    "release": "npx bumpp --no-push"
   }
 }

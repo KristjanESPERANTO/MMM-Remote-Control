@@ -12,6 +12,7 @@
     "Ausschalten",
     "Bethge",
     "bokmål",
+    "bumpp",
     "cambio",
     "chlog",
     "defaultmodules",
@@ -40,7 +41,6 @@
     "MONITORSTATUS",
     "MONITORTIMED",
     "MONITORTOGGLE",
-    "mymodulename",
     "mypayload",
     "Mysh",
     "navicon",
@@ -57,6 +57,7 @@
     "showalert",
     "SHOWALL",
     "somthingelse",
+    "stylelint",
     "TOGGLEFULLSCREEN",
     "UPDATEMM",
     "userpresence",
@@ -71,7 +72,5 @@
     "translations/**",
     "*.min.js"
   ],
-  "dictionaries": [
-    "node"
-  ]
+  "dictionaries": ["node"]
 }
