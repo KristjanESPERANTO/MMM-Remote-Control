@@ -516,7 +516,7 @@ const Remote = {
                 delete self.pendingCallback;
             }
         } catch (error) {
-            console.debug("Error loading list:", error);
+            console.log("[MMM-Remote-Control] Error loading list: " + error);
             self.show(emptyIndicator);
         }
     },
@@ -535,7 +535,7 @@ const Remote = {
     },
 
     formatLabel(string) {
-        // let result = string.replace(/([A-Z])/g, " $1" );
+        // var result = string.replace(/([A-Z])/g, " $1" );
         // return result.charAt(0).toUpperCase() + result.slice(1);
         return string;
     },
@@ -985,7 +985,7 @@ const Remote = {
         }
         for (let i = 0; i < keys.length; i++) {
             const key = keys[i];
-            if (dataToEdit.hasOwnProperty(key)) {
+            if (Object.prototype.hasOwnProperty.call(dataToEdit, key)) {
                 wrapper.appendChild(this.createObjectGUI(path + "/" + key, key, dataToEdit[key]));
             }
         }
@@ -1335,11 +1335,11 @@ const Remote = {
         const info = document.createElement("span");
         info.innerHTML = message;
         wrapper.appendChild(info);
-
+        
         const restart = this.createSymbolText("fa fa-fw fa-recycle", this.translate("RESTARTMM"), buttons["restart-mm-button"]);
         restart.children[1].className += " text";
         wrapper.appendChild(restart);
-
+        
         const reload = this.createSymbolText("fa fa-fw fa-globe", this.translate("REFRESHMM"), buttons["refresh-mm-button"]);
         reload.children[1].className += " text";
         wrapper.appendChild(reload);
