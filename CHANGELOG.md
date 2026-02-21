@@ -289,6 +289,14 @@ There should be no breaking changes in this release, but due to the extent of th
 - **coverage:** expand unit tests for core helpers and handlers ([8c7cea0](https://github.com/jopyth/MMM-Remote-Control/commit/8c7cea09f1eb26399b1905d9c058e58b83d146d4))
 - migrate timer mocking to Node's native mock.timers ([45dafb0](https://github.com/jopyth/MMM-Remote-Control/commit/45dafb0653055f704f3ad6a5f830c8fc23eb20c5))
 
+## [unreleased](https://github.com/jopyth/MMM-Remote-Control/compare/v3.3.2...HEAD)
+
+**Note:** This release changes the default monitor control commands to support modern Raspberry Pi OS (Wayland). Users can restore the previous behavior via `customCommand` configuration. See the [Monitor Control Guide](docs/guide/monitor-control.md) for migration instructions and alternatives for all supported systems.
+
+### Changed
+
+- **BREAKING:** refactor: default monitor control commands now use Wayland (`wlr-randr`) instead of deprecated `vcgencmd` to support Raspberry Pi OS Bookworm and newer (Wayland has been the default since 2023)
+
 ## [3.3.2](https://github.com/jopyth/MMM-Remote-Control/compare/v3.3.1...v3.3.2) - 2025-12-13
 
 ### Changed

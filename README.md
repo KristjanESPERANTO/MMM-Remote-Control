@@ -261,7 +261,7 @@ Can also be used with the [API](https://documenter.getpostman.com/view/6167403/R
 
 Override default shell commands for shutdown, reboot, and monitor control. See the [Custom Commands Guide](docs/guide/custom-commands.md) for details.
 
-> **Monitor not turning on/off?** The default `vcgencmd` commands don't work on newer Raspberry Pi OS (Bookworm+). See the [Monitor Control Guide](docs/guide/monitor-control.md) for Wayland, X11, CEC, and other options.
+> **Since v4.0.0:** The default monitor commands use `wlr-randr` for Wayland (Raspberry Pi OS Bookworm+). For older systems with X11 or `vcgencmd`, see the [Monitor Control Guide](docs/guide/monitor-control.md).
 
 ### Custom Classes
 
