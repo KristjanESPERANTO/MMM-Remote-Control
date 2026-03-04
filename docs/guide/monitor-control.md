@@ -4,7 +4,9 @@ Configure monitor on/off commands for different display systems.
 
 ## Overview
 
-The default monitor commands use `vcgencmd`, which works on older Raspberry Pi OS versions. However, **Raspberry Pi OS Bookworm (2023) and newer use Wayland by default**, where `vcgencmd display_power` no longer works.
+**Since version 5.0.0**, the default monitor commands use `wlr-randr` for Wayland, which is the default display server on Raspberry Pi OS Bookworm (2023) and newer.
+
+If you're using an older system with X11, or a different setup, configure the appropriate commands below.
 
 Check your display server:
 
@@ -14,27 +16,9 @@ echo $XDG_SESSION_TYPE  # Shows 'wayland' or 'x11'
 
 ## Commands by Display System
 
-### Legacy vcgencmd (Default)
-
-Works on Raspberry Pi OS Buster/Bullseye with X11.
+### Wayland (Default - Raspberry Pi OS Bookworm+)
 
 **Default commands** (no configuration needed):
-
-```js
-customCommand: {
-    monitorOnCommand: 'vcgencmd display_power 1',
-    monitorOffCommand: 'vcgencmd display_power 0',
-    monitorStatusCommand: 'vcgencmd display_power -1'
-}
-```
-
-> **Note:** `vcgencmd display_power` has been deprecated and may not work on Raspberry Pi OS Bookworm and newer.
-
----
-
-### Wayland (Raspberry Pi OS Bookworm+)
-
-For systems using Wayland (default since Raspberry Pi OS Bookworm):
 
 ```js
 customCommand: {
@@ -44,13 +28,9 @@ customCommand: {
 }
 ```
 
-Install `wlr-randr`:
+> **Note:** You may need to install `wlr-randr` first: `sudo apt-get install wlr-randr`
 
-```bash
-sudo apt-get install wlr-randr
-```
-
-Find your output name:
+Find your output name (might be `HDMI-A-2`, `HDMI-1`, etc.):
 
 ```bash
 wlr-randr
@@ -65,6 +45,22 @@ customCommand: {
     monitorStatusCommand: 'WAYLAND_DISPLAY="wayland-1" wlr-randr | grep -q "Enabled: yes" && echo "true" || echo "false"'
 }
 ```
+
+---
+
+### Legacy vcgencmd (Raspberry Pi OS Buster/Bullseye)
+
+For older Raspberry Pi OS versions with X11:
+
+```js
+customCommand: {
+    monitorOnCommand: 'vcgencmd display_power 1',
+    monitorOffCommand: 'vcgencmd display_power 0',
+    monitorStatusCommand: 'vcgencmd display_power -1'
+}
+```
+
+> **Note:** `vcgencmd display_power` has been deprecated and may not work on Raspberry Pi OS Bookworm and newer.
 
 ---
 
